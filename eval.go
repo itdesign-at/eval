@@ -28,9 +28,6 @@ var FloatError = math.NaN()
 // Calculations:
 //  +, -, *, /
 //
-// Table of built-in functions
-//  abs(x)                  abs returns the absolute value of x
-//  avg(f1,f2, ...)         returns the average of a range of floats
 //  env("x")                get environment variable x (as string)
 //  float64(x)              convert x to float64 e.g. float64(env("pi"))
 //  ifExpr(condition,x,y)   condition = true return x otherwise y
@@ -213,11 +210,6 @@ func (e *Eval) eval(exp ast.Expr) interface{} {
 }
 
 // abs - implements the 'abs(x)' function and returns the absolute value of x.
-//
-// Examples:
-//   abs(-3.14) ... 3.14
-//   abs(3.14)  ... 3.14
-//
 // Returns a float64 value or math.NaN() on error.
 func (e *Eval) abs(exp *ast.CallExpr) float64 {
 	if len(exp.Args) != 1 {
@@ -240,27 +232,16 @@ func (e *Eval) abs(exp *ast.CallExpr) float64 {
 }
 
 // avg - implements the 'avg(x,y,z,...)' function and returns the average of a range numbers
-//
-// Example:
-//   avg(20,40) ... 30
-//
 // Returns a float64 value or math.NaN() on error.
 func (e *Eval) avg(exp *ast.CallExpr) float64 {
 	return e.avgMaxMin(exp, 3)
 }
 
-// env - implements the 'env("<var>")' function, reads the environment variable <var> and
-// returns it's content as string.
-// The main purpose of reading environment variables is to make it possible to pass something
-// from the outside when calling the main program. In our case a power set limit ...
-//
-// Shell example:
-//   # export PA_SET_REL=10 && /opt/sam/bin/modbus-collector ....
 //
 // Examples:
 //   env("HOME") 	... e.g. root under linux
 //   float64(env("pi"))	... 3.14159 as float64 when 'pi' is set
-//   if(env("notSet")=="","isEmpty","isFilled")  ... "isEmpty" as string
+//   ifExpr(env("notSet")=="","isEmpty","isFilled")  ... "isEmpty" as string
 //
 // Returns an empty string when not found.
 func (e *Eval) env(exp *ast.CallExpr) string {

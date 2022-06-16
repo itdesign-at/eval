@@ -766,6 +766,7 @@ func TestAvgMaxMin(t *testing.T) {
 		`max(109.5)`:                        109.5,
 		`min(10)`:                           10.0,
 		`avg(10,20)`:                        15.0,
+		`avg(30,"10","20.0","John Doe")`:    20.0,
 		`max(10,20)`:                        20.0,
 		`min(10,20)`:                        10.0,
 		`avg(max(10,20,30),min(""))`:        math.NaN(),
