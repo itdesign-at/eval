@@ -512,8 +512,8 @@ func (e *Eval) avgMaxMin(exp *ast.CallExpr, flag int) float64 {
 			floats = append(floats, val)
 		case string:
 			val = stringer(val)
-			f, err := strconv.ParseFloat(val, 64)
-			if err == nil {
+			f := floater(val)
+			if !math.IsNaN(f) { // skip invalid strings
 				floats = append(floats, f)
 			}
 		}
@@ -569,15 +569,7 @@ func (e *Eval) pow(exp *ast.CallExpr) float64 {
 		fa = v
 	case string:
 		v = stringer(v)
-		i, err := strconv.Atoi(v) // first try -> integer
-		if err == nil {
-			fa = float64(i)
-			break
-		}
-		f, err := strconv.ParseFloat(v, 64) // second try -> float64
-		if err == nil {
-			fa = f
-		}
+		fa = floater(v)
 	default:
 		fa = FloatError
 	}
@@ -588,15 +580,7 @@ func (e *Eval) pow(exp *ast.CallExpr) float64 {
 		fb = v
 	case string:
 		v = stringer(v)
-		i, err := strconv.Atoi(v) // first try -> integer
-		if err == nil {
-			fb = float64(i)
-			break
-		}
-		f, err := strconv.ParseFloat(v, 64) // second try -> float64
-		if err == nil {
-			fb = f
-		}
+		fb = floater(v)
 	default:
 		fb = FloatError
 	}
@@ -681,6 +665,8 @@ func (e *Eval) round(exp *ast.CallExpr) float64 {
 		fa = float64(v)
 	case float64:
 		fa = v
+	case string:
+		fa = floater(v)
 	default:
 		fa = FloatError
 	}
@@ -689,6 +675,8 @@ func (e *Eval) round(exp *ast.CallExpr) float64 {
 		fb = float64(v)
 	case float64:
 		fb = v
+	case string:
+		fb = floater(v)
 	default:
 		fb = FloatError
 	}
@@ -1338,4 +1326,21 @@ func stringer(s string) string {
 		return strings.Trim(s, `"`)
 	}
 	return s
+}
+
+// floater takes string s and converts it to a float64 value. It
+// returns FloatError on error which can be checked with math.IsNaN(f).
+func floater(s string) float64 {
+	var err error
+	var i int
+	var f float64
+	i, err = strconv.Atoi(s)
+	if err == nil {
+		return float64(i)
+	}
+	f, err = strconv.ParseFloat(s, 64)
+	if err == nil {
+		return f
+	}
+	return FloatError
 }

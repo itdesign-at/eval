@@ -167,6 +167,7 @@ func TestCalcsWithFloatInt(t *testing.T) {
 		"1 + 3.141":               4.141,
 		"3.141 + 1":               4.141,
 		"-18 / -10":               1.8,
+		"round(-10/-18,\"2\")":    0.56,
 		"round(-10/-18,2)":        0.56,
 		"round(pow(-10/-18,2),2)": 0.31,
 		"round(pow(2,-10/-18),2)": 1.47,
@@ -616,10 +617,11 @@ func TestFloat64Cast(t *testing.T) {
 func TestRound(t *testing.T) {
 
 	var ok = map[string]float64{
-		`round(3.14159,3)`:  3.142,
-		`round(3.14159,2)`:  3.14,
-		`round(3.14159,0)`:  3,
-		`round(3.14159,-1)`: 0,
+		`round(3.14159,3)`:   3.142,
+		`round(3.14159,2)`:   3.14,
+		`round(3.14159,0)`:   3,
+		`round(3.14159,-1)`:  0,
+		`round("3.14159",3)`: 3.142,
 	}
 
 	for s, r := range ok {
