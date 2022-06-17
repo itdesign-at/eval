@@ -1,5 +1,6 @@
 # eval
-go eval implementation to use and learn the ast package  
+go eval implementation to use and learn the ast package. A working shell calculator which uses
+this packages can be found in cmd/calc.
 
 First example:
 ```
