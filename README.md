@@ -35,7 +35,14 @@ func main() {
 }
 ```
 # Variables
+As in golang variables are written as character-strings but with the exception that special characters can be used, too.
+See function val("var") and setVal("var") for details.
+
+# Numeric calculations
+Basic numeric calculations are implemented +, -, / and *. 
+
 # Functions
+Alphabetically list of function
 ## abs(x) 
 abs implements the 'abs(x)' function and returns the absolute value of x.
 
@@ -65,3 +72,31 @@ from the outside when calling the main program.
     ifExpr(env("notSet")=="","isEmpty","isFilled") ... "isEmpty" as string
 
 Returns an empty string when not found.
+
+## float64(x)
+float64 - implements the 'float64(x)' function and converts x to float64
+
+    float64(pow(2,2)) ... 4.0
+    float64("-2.27")" ... -2.27  // string ok when numeric
+    float64(1>0 && 2>1) ...  1.0 // bool true results in 1.0
+
+Returns a float64 value or math.NaN() on error.
+
+## ifExpr(condition,x,y)
+ifExpr - implements 'if (condition,true value,false value)' which is
+similar to an 'if' statement in a programming language. Can also be compared with
+spreadsheets '=IF()' statement.
+
+    ifExpr(x>1,100,0)                 ... depends on x, returns 100 or 0
+    ifExpr(2>1,"greater 1","lower 1") ... returns "greater 1" as string
+    ifExpr(2>1,1==1,1==0)             ... returns true as bool
+
+Returns true/false or a math.NaN() on error.
+
+## int(x)
+int - implements the 'int(x)' function and converts x to int
+
+    int(-3.141) ... -3
+    int("-1")`  ... -1
+    int(false)` ... 0
+

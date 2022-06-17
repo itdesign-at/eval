@@ -28,10 +28,6 @@ var FloatError = math.NaN()
 // Calculations:
 //  +, -, *, /
 //
-//  env("x")                get environment variable x (as string)
-//  float64(x)              convert x to float64 e.g. float64(env("pi"))
-//  ifExpr(condition,x,y)   condition = true return x otherwise y
-//  int(x)                  convert x to int e.g. int(3.88) results in 3
 //  isBetween(<val>,x,y)    returns true if val >= x and val <= y
 //  isNaN(f1)               This function is usable for error handling and checks
 //                          if the given float is math.NaN()
@@ -262,17 +258,6 @@ func (e *Eval) env(exp *ast.CallExpr) string {
 }
 
 // float64 - implements the 'float64(x)' float64(x) function and converts x to float64
-//
-// Examples:
-//   float64("-2.27")   ... -2.27
-//   float64(env("x"))  ... 1.2 where x is en environment variable
-//   float64(1>0)       ... 1.0
-//   float64(1)         ... 1.0
-//   float64(0>0)       ... 0.0
-//   float64(true)      ... 1.0
-//   float64(false)     ... 0.0
-//   float64("NaN")     ... math.NaN() -> force a float64 error
-//
 // Returns a float64 value or math.NaN() on error.
 func (e *Eval) float64(exp *ast.CallExpr) float64 {
 	l := len(exp.Args)
@@ -325,12 +310,6 @@ func (e *Eval) float64(exp *ast.CallExpr) float64 {
 
 // ifExpr - implements 'if (<condition>,<true value>,<false value>)' which is
 // similar to an 'if' statement in a programming language.
-//
-// Examples:
-//   ifExpr(val("x")>1,100,0)          ... depends on x, returns 100 or 0
-//   ifExpr(2>1,"greater 1","lower 1") ... returns "greater 1" as string
-//   ifExpr(2>1,1==1,1==0)             ... returns true as bool
-//
 // Returns true/false or a math.NaN() on error.
 func (e *Eval) ifExpr(exp *ast.CallExpr) interface{} {
 	if len(exp.Args) != 3 {
@@ -1264,6 +1243,7 @@ func (e *Eval) sprintf(exp *ast.CallExpr) interface{} {
 	return FloatError
 }
 
+// int converts input to an integer
 func (e *Eval) int(exp *ast.CallExpr) interface{} {
 	l := len(exp.Args)
 	if l < 1 {
