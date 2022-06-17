@@ -17,8 +17,8 @@ Shell calculator example
 Example usage:
 
 go build
-./calc -n 16 -text "Shell calculator result:" -pi 3.131 'sprintf ("%s %.3f",text,pi*n)'
-Shell calculator result: 50.096
+./calc -n 16 -text "Shell calculator result:" -pi 3.141 'sprintf ("%s %.3f",text,pi*n)'
+Shell calculator result: 50.256
 
 */
 
