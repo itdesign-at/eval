@@ -28,23 +28,6 @@ var FloatError = math.NaN()
 // Calculations:
 //  +, -, *, /
 //
-//  isBetween(<val>,x,y)    returns true if val >= x and val <= y
-//  isNaN(f1)               This function is usable for error handling and checks
-//                          if the given float is math.NaN()
-//  max(f1,f2, ...)         returns the maximum of a range of floats
-//  min(f1,f2, ...)         returns the minimum of a range of floats
-//  pow(x,y)                pow returns x**y, the base-x exponential of y
-//  regexpMatch("r","s")    check string s against regular expression r
-//  round(x,y)              round x to y digits
-//  setVal("i",1,"s","str", etc.)    set a range of variables (key -> value pairs)
-//  sqrt(x)                 sqrt returns the square root of x
-//  substr("str",idx,len)   extract a substring out of "str"
-//  time("<x>","<fmt>")     get time of value <x> in format <fmt> as int64 or string
-//  val("x")                access (read) variable "x"
-//
-// Each of the functions implemented has a go method X<function> - see documentations
-// end examples below.
-//
 type Eval struct {
 	input     string
 	exp       ast.Expr
@@ -392,15 +375,6 @@ func (e *Eval) isBetween(exp *ast.CallExpr) interface{} {
 
 // isNaN - implements 'isNaN(<val>)' where <val> could be a valid float.
 // This function is usable for error handling.
-//
-// Examples:
-//   isNaN(float64(NaN)) ... true
-//   isNaN(float64(5.5)) ... false
-//   isNaN(5.1)      ... false
-//   isNaN(555)      ... false
-//   isNaN(blabla)   ... true
-//   isNaN("text")   ... true
-//
 // Returns true or false.
 func (e *Eval) isNaN(exp *ast.CallExpr) bool {
 	if len(exp.Args) != 1 {
@@ -449,28 +423,14 @@ func (e *Eval) isNaN(exp *ast.CallExpr) bool {
 	return true
 }
 
-// max - implements 'max(f1,f2, ...)' and returns the maximum of a range of floats
-//
-// Examples:
-//
-//   max(0,-3.33,97.77)                   ... 97.77
-//   max(10,20,30,-1.2,"ignore strings")` ... 30.0
-//   max("10",8)`                         ... 10.0
-//   max()                                ... math.NaN()
-//
-// Returns true/false or a math.NaN() on error.
+// max returns the maximum of a range of numbers
+// Returns float64 or a math.NaN() on error.
 func (e *Eval) max(exp *ast.CallExpr) float64 {
 	return e.avgMaxMin(exp, 2)
 }
 
-// min - implements 'min(f1,f2, ...)' and returns the minimum of a range of floats
-//
-// Examples:
-//   min(0,-3.33,97.77)                   ... -3.33
-//   min(10,20,30,-1.2,"ignore strings")` ... -1.2
-//   min()                                ... math.NaN()
-//
-// Returns true/false or a math.NaN() on error.
+// min returns the minimum of a range of numbers
+// Returns float64 or a math.NaN() on error.
 func (e *Eval) min(exp *ast.CallExpr) float64 {
 	return e.avgMaxMin(exp, 1)
 }
@@ -491,7 +451,7 @@ func (e *Eval) avgMaxMin(exp *ast.CallExpr, flag int) float64 {
 			floats = append(floats, val)
 		case string:
 			val = stringer(val)
-			f := floater(val)
+			f := toFloat(val)
 			if !math.IsNaN(f) { // skip invalid strings
 				floats = append(floats, f)
 			}
@@ -526,10 +486,6 @@ func (e *Eval) avgMaxMin(exp *ast.CallExpr, flag int) float64 {
 }
 
 // pow - implements 'pow(<base x>,<exponent y>)' and returns x**y, the base-x exponential of y.
-//
-// Example:
-//   pow(10,2) ... 100
-//
 // Returns a float64 value or a math.NaN() on error.
 func (e *Eval) pow(exp *ast.CallExpr) float64 {
 	if len(exp.Args) != 2 {
@@ -548,7 +504,7 @@ func (e *Eval) pow(exp *ast.CallExpr) float64 {
 		fa = v
 	case string:
 		v = stringer(v)
-		fa = floater(v)
+		fa = toFloat(v)
 	default:
 		fa = FloatError
 	}
@@ -559,7 +515,7 @@ func (e *Eval) pow(exp *ast.CallExpr) float64 {
 		fb = v
 	case string:
 		v = stringer(v)
-		fb = floater(v)
+		fb = toFloat(v)
 	default:
 		fb = FloatError
 	}
@@ -569,12 +525,6 @@ func (e *Eval) pow(exp *ast.CallExpr) float64 {
 
 // regexpMatch - implements 'regexpMatch ("<regex>","string")' and returns true when the
 // string matches
-//
-// Example:
-//
-//   regexpMatch ("^\d$","1234") ... true
-//
-// Returns true/false or a math.NaN() on error.
 func (e *Eval) regexpMatch(exp *ast.CallExpr) bool {
 	if len(exp.Args) != 2 {
 		return false
@@ -623,11 +573,6 @@ func (e *Eval) regexpMatch(exp *ast.CallExpr) bool {
 // round - implements the 'round (x,y)' function which
 // rounds x to y decimal places.
 //
-// Examples:
-//   round(3.14159,3)   ...  3.142
-//   round(3.14159,0)   ...  3
-//   round(3.14159,-1)  ...  0
-//
 // Returns a float64 value or math.NaN() on error.
 func (e *Eval) round(exp *ast.CallExpr) float64 {
 	if len(exp.Args) != 2 {
@@ -645,7 +590,7 @@ func (e *Eval) round(exp *ast.CallExpr) float64 {
 	case float64:
 		fa = v
 	case string:
-		fa = floater(v)
+		fa = toFloat(v)
 	default:
 		fa = FloatError
 	}
@@ -655,7 +600,7 @@ func (e *Eval) round(exp *ast.CallExpr) float64 {
 	case float64:
 		fb = v
 	case string:
-		fb = floater(v)
+		fb = toFloat(v)
 	default:
 		fb = FloatError
 	}
@@ -667,12 +612,6 @@ func (e *Eval) round(exp *ast.CallExpr) float64 {
 
 // setVal - implements the 'setVal(a,b,c,d,...)' function which
 // sets variables in pairs of 2.
-//
-// Examples:
-//   setVal("a",10)                   ... sets the variable a to 10
-//   setVal("a",10,"name","Werner")   ... sets the variable a to 10 and name to "Werner"
-//   setVal("n",val("n")+3*4)         ... increase n by 12
-//
 // Returns nil or a golang error.
 func (e *Eval) setVal(exp *ast.CallExpr) error {
 	l := len(exp.Args)
@@ -708,11 +647,6 @@ func (e *Eval) setVal(exp *ast.CallExpr) error {
 }
 
 // sqrt - implements 'sqrt(x)' which returns the square root of x.
-//
-// Examples:
-//   sqrt(16)         ... 4
-//   round(sqrt(3),2) ... 1.73
-//
 // Returns a float64 value or math.NaN() on error.
 func (e *Eval) sqrt(exp *ast.CallExpr) float64 {
 	if len(exp.Args) != 1 {
@@ -807,14 +741,7 @@ func (e *Eval) substr(exp *ast.CallExpr) string {
 }
 
 // time - implements 'time ("<action>","<format>")' to get a time as int64 or string
-//
-// Examples:
-//   time("","")                 ...  1423542512 = ("now","epoch") (int64)
-//   time("now","RFC3339")       ...  2020-07-02T07:39:10+02:00 (string)
-//   time("starttime","epoch")   ...  1423542512 (int64), start time of program
-//   time("starttime","rfc3339") ...  2020-07-02T07:39:10+02:00 (string)
-//
-// Returns a int64 value or a string.
+// Returns an int64 value or a string.
 func (e *Eval) time(exp *ast.CallExpr) interface{} {
 	if len(exp.Args) != 2 {
 		return ""
@@ -858,11 +785,6 @@ func (e *Eval) time(exp *ast.CallExpr) interface{} {
 // val - implements 'val("<name>")' to get the content of a variable. It returns
 // an empty string when the variable is not found. Stored internally in the
 // e.Variables(map[string]interface{}) map.
-//
-// Examples:
-//   setVal("a",true) ; val("a") ... true
-//   setVal("a",0) ; val("a")    ... 0.0
-//   setVal("s","str") ; val("s") .. "str"
 //
 // Returns the value of the variable or an empty string on error.
 func (e *Eval) val(exp *ast.CallExpr) interface{} {
@@ -1308,9 +1230,9 @@ func stringer(s string) string {
 	return s
 }
 
-// floater takes string s and converts it to a float64 value. It
+// toFloat takes string s and converts it to a float64 value. It
 // returns FloatError on error which can be checked with math.IsNaN(f).
-func floater(s string) float64 {
+func toFloat(s string) float64 {
 	var err error
 	var i int
 	var f float64
