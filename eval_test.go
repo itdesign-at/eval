@@ -167,6 +167,7 @@ func TestCalcsWithFloatInt(t *testing.T) {
 		"1 + 3.141":               4.141,
 		"3.141 + 1":               4.141,
 		"-18 / -10":               1.8,
+		"round(-10/-18,\"2\")":    0.56,
 		"round(-10/-18,2)":        0.56,
 		"round(pow(-10/-18,2),2)": 0.31,
 		"round(pow(2,-10/-18),2)": 1.47,
@@ -616,10 +617,11 @@ func TestFloat64Cast(t *testing.T) {
 func TestRound(t *testing.T) {
 
 	var ok = map[string]float64{
-		`round(3.14159,3)`:  3.142,
-		`round(3.14159,2)`:  3.14,
-		`round(3.14159,0)`:  3,
-		`round(3.14159,-1)`: 0,
+		`round(3.14159,3)`:   3.142,
+		`round(3.14159,2)`:   3.14,
+		`round(3.14159,0)`:   3,
+		`round(3.14159,-1)`:  0,
+		`round("3.14159",3)`: 3.142,
 	}
 
 	for s, r := range ok {
@@ -766,6 +768,7 @@ func TestAvgMaxMin(t *testing.T) {
 		`max(109.5)`:                        109.5,
 		`min(10)`:                           10.0,
 		`avg(10,20)`:                        15.0,
+		`avg(30,"10","20.0","John Doe")`:    20.0,
 		`max(10,20)`:                        20.0,
 		`min(10,20)`:                        10.0,
 		`avg(max(10,20,30),min(""))`:        math.NaN(),
@@ -894,23 +897,23 @@ func TestIsBetween(t *testing.T) {
 
 	_ = os.Setenv("x", "50.5")
 	var ok = map[string]bool{
-		`isBetween(-1,0,1)`:                              false,
-		`isBetween(-1,0,0)`:                              false,
-		`isBetween(1,0,1)`:                               true,
-		`isBetween("1",0,1)`:                             true,
-		`isBetween("1","0","1")`:                         true,
-		`isBetween("1",0,0)`:                             false,
-		`isBetween(env("x"),0,100)`:                      true,
-		`isBetween(env("x"),0,50.5)`:                     true,
-		`isBetween(env("x"),50.5,50.5)`:                  true,
-		`isBetween(env("x"),50.5,0)`:                     false,
-		`isBetween(env("y"),0,100)`:                      false,
-		`isBetween(env("x"),val("a"),abs(val("b"))`:      true,
-		`isBetween(time("now",""),0,9999999999`:          false,
-		`isBetween(float64(time("now","")),0,9999999999`: true,
-		`isBetween(-0.95,-0.99,-0.90`:                    true,
-		`isBetween(-0.89,-0.99,-0.90`:                    false,
-		`isBetween(something,"Wrong",/)`:                 false,
+		`isBetween(-1,0,1)`:                               false,
+		`isBetween(-1,0,0)`:                               false,
+		`isBetween(1,0,1)`:                                true,
+		`isBetween("1",0,1)`:                              true,
+		`isBetween("1","0","1")`:                          true,
+		`isBetween("1",0,0)`:                              false,
+		`isBetween(env("x"),0,100)`:                       true,
+		`isBetween(env("x"),0,50.5)`:                      true,
+		`isBetween(env("x"),50.5,50.5)`:                   true,
+		`isBetween(env("x"),50.5,0)`:                      false,
+		`isBetween(env("y"),0,100)`:                       false,
+		`isBetween(env("x"),val("a"),abs(val("b"))`:       true,
+		`isBetween(time("now",""),0,9999999999)`:          false,
+		`isBetween(float64(time("now","")),0,9999999999)`: true,
+		`isBetween(-0.95,-0.99,-0.90)`:                    true,
+		`isBetween(-0.89,-0.99,-0.90)`:                    false,
+		`isBetween(something,"Wrong",/)`:                  false,
 	}
 
 	for s, r := range ok {
