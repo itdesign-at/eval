@@ -14,9 +14,11 @@ import (
 
 Shell calculator example
 
-Example usage:
-
 go build
+
+./calc '1/3'
+0.3333333333333333
+
 ./calc -n 16 -text "Shell calculator result:" -pi 3.141 'sprintf ("%s %.3f",text,pi*n)'
 Shell calculator result: 50.256
 

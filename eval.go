@@ -55,18 +55,6 @@ func (e *Eval) SetInput(input string) {
 
 // Variables adds external variables. In most cases these
 // are float64 or strings.
-//
-// Example:
-//  var variables = map[string]float64 {
-//    "pi": 3.14159,
-//    "r": 120,
-//  }
-//  e := eval.New(`round(pow(val("r"),2) * val("pi"),0)`)
-//  if e.ParseExpr() == nil {
-//    e.Variables(variables)
-//    // prints "Result: 45239"
-//    fmt.Println("Result:", e.Run())
-//  }
 func (e *Eval) Variables(variables map[string]interface{}) *Eval {
 	e.variables = variables
 	return e
@@ -216,13 +204,8 @@ func (e *Eval) avg(exp *ast.CallExpr) float64 {
 	return e.avgMaxMin(exp, 3)
 }
 
-//
-// Examples:
-//   env("HOME") 	... e.g. root under linux
-//   float64(env("pi"))	... 3.14159 as float64 when 'pi' is set
-//   ifExpr(env("notSet")=="","isEmpty","isFilled")  ... "isEmpty" as string
-//
-// Returns an empty string when not found.
+// env - implements the 'env("str")' function, reads the environment variable "str" and
+// returns it's content as string.
 func (e *Eval) env(exp *ast.CallExpr) string {
 	l := len(exp.Args)
 	if l < 1 {
@@ -235,7 +218,6 @@ func (e *Eval) env(exp *ast.CallExpr) string {
 		val = stringer(val)
 		envResult = os.Getenv(val)
 	default:
-		// // mlog.Tracef("\tast env() error, type %T is invalid", s)
 	}
 	return envResult
 }
@@ -286,7 +268,6 @@ func (e *Eval) float64(exp *ast.CallExpr) float64 {
 			return f
 		}
 	default:
-		// mlog.Tracef("\tast float64() error, type %T is invalid", s)
 	}
 	return FloatError
 }
@@ -304,19 +285,16 @@ func (e *Eval) ifExpr(exp *ast.CallExpr) interface{} {
 	switch condition.(type) {
 	case bool:
 		if condition.(bool) {
-			// mlog.Tracef("\tast ifExp(%v,%v,%v) => %v", condition, trueValue, falseValue, trueValue)
 			if strVal, ok := trueValue.(string); ok {
 				return stringer(strVal)
 			}
 			return trueValue
 		}
-		// mlog.Tracef("\tast ifExp(%v,%v,%v) => %v", condition, trueValue, falseValue, falseValue)
 		if strVal, ok := falseValue.(string); ok {
 			return stringer(strVal)
 		}
 		return falseValue
 	default:
-		// mlog.Tracef("\tast ERROR ifExp() condition is of type %T", condition)
 	}
 	return FloatError
 }
@@ -418,7 +396,7 @@ func (e *Eval) isNaN(exp *ast.CallExpr) bool {
 		}
 		return math.IsNaN(f)
 	default:
-		// mlog.Tracef("\tast float64() error, type %T is invalid", s)
+		//
 	}
 	return true
 }
@@ -562,10 +540,6 @@ func (e *Eval) regexpMatch(exp *ast.CallExpr) bool {
 	if err != nil {
 		return false
 	}
-	//if global.IsError(er) {
-	//	return false
-	//}
-	// mlog.Tracef("\tast regexPattern: %s regexString: %s", regexPattern, regexString)
 	b := r.MatchString(regexString)
 	return b
 }
@@ -606,7 +580,7 @@ func (e *Eval) round(exp *ast.CallExpr) float64 {
 	}
 
 	x := math.Pow10(int(fb))
-	// mlog.Tracef("\tast round(%f, %f)", a, b)
+
 	return math.Round(fa*x) / x
 }
 
@@ -658,6 +632,9 @@ func (e *Eval) sqrt(exp *ast.CallExpr) float64 {
 		return math.Sqrt(float64(f))
 	case float64:
 		return math.Sqrt(f)
+	case string:
+		f = stringer(f)
+		return math.Sqrt(toFloat(f))
 	default:
 		return FloatError
 	}
@@ -705,10 +682,8 @@ func (e *Eval) substr(exp *ast.CallExpr) string {
 		}
 		if cutL > len(s) {
 			cutL = len(s)
-			// mlog.Tracef("\tast substr() length to large, set to %T", cutL)
 		}
 		if math.Abs(float64(startP)) >= float64(len(s)) {
-			// mlog.Tracef("\tast substr() error, start %T is invalid", startP)
 			return StringError
 		}
 		if startP >= 0 && cutL == -1 {
@@ -727,7 +702,6 @@ func (e *Eval) substr(exp *ast.CallExpr) string {
 			return s[x : x+cutL]
 		}
 		if startP+cutL < startP {
-			// mlog.Tracef("\tast substr() error, len %T is invalid", cutL)
 			return StringError
 		}
 		if startP+cutL >= l {
@@ -735,7 +709,6 @@ func (e *Eval) substr(exp *ast.CallExpr) string {
 		}
 		return s[startP : startP+cutL]
 	default:
-		// mlog.Tracef("\tast ERROR substr() string is of type %T", theString)
 	}
 	return StringError
 }
@@ -797,7 +770,6 @@ func (e *Eval) val(exp *ast.CallExpr) interface{} {
 		if f, ok := e.variables[key]; ok {
 			return f
 		}
-		// mlog.Tracef("\tast val() error, key %s not found", name)
 	}
 	return ""
 }
@@ -814,7 +786,6 @@ func (e *Eval) getArg(exp ast.Expr) interface{} {
 	case string:
 		return stringer(val)
 	default:
-		// mlog.Tracef("\tast getArg() error, type %T is invalid", x)
 	}
 	return math.NaN()
 }
@@ -1214,7 +1185,6 @@ func (e *Eval) int(exp *ast.CallExpr) interface{} {
 			return int(f)
 		}
 	default:
-		// mlog.Tracef("\tast float64() error, type %T is invalid", s)
 	}
 	return FloatError
 }

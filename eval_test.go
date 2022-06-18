@@ -682,6 +682,7 @@ func TestSqrt(t *testing.T) {
 
 	var ok = map[string]float64{
 		`sqrt(16)`:         4,
+		`sqrt("16")`:       4,
 		`round(sqrt(3),2)`: 1.73,
 	}
 

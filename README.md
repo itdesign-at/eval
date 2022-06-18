@@ -165,7 +165,7 @@ e.g. setVal("i",1,"s","str", etc.) set a range of variables (key -> value pairs)
 setVal allows to add variables with special characters in the key (see $SYS/b example)
 
 ## sqrt (x)
-qrt - implements 'sqrt(x)' which returns the square root of x.
+sqrt - implements 'sqrt(x)' which returns the square root of x.
 
     sqrt(16) ... 4
     round(sqrt(3),2) ... 1.73
